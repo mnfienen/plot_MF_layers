@@ -1,0 +1,7 @@
+modelbottoms='Columbia_bots_corr2_SFRcorr.dat' # multilayer ascii matrix of model bottoms
+L1top='L1top.DAT' # ascii matrix of Layer1 top
+xsname='Col_xsections.pdf' # output file name
+colors=['Peru','SaddleBrown','OliveDrab','CornSilk','Teal','CornSilk'] # choose any html colors
+interval=100 # make a section every nth cell
+rows=[1,1] # [startrow,endrow]
+columns=[1,1] # [startcolumn,endcolumn]
