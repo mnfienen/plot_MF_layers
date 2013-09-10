@@ -46,7 +46,7 @@ def read_meta_data(infile):
     
     # skip the CBD line
     junkus = indat.pop(0)
-    
+        
     # check if grid is uniform (first number will be 0)
     if int(indat[0].split()[0])==0:
         uniform=True
@@ -54,16 +54,16 @@ def read_meta_data(infile):
         dx=float(indat[0].split()[1].split('(')[0])
         DX=(dx*np.arange(NCOL))
         junkus = indat.pop(0)
-        print uniform
+    
     if int(indat[0].split()[0])==0:
         dy=float(indat[0].split()[1].split('(')[0])
-        DY=(dx*np.arange(NROW))
+        DY=(dy*np.arange(NROW))
         junkus = indat.pop(0)
-    
+        
     if not uniform:
         junkus = indat.pop(0)
         
-        # now read the DX values
+        # now read the DX values (make sure this is indented!)
         contflag = True
         for i in np.arange(len(indat)):
             if contflag == False:
@@ -73,7 +73,7 @@ def read_meta_data(infile):
             else:
                 contflag = False
         DX = np.array(DX,dtype=float)
-        
+                
         # now read the DY values
         contflag = True
         for i in np.arange(i,len(indat)):
@@ -84,10 +84,10 @@ def read_meta_data(infile):
             else:
                 contflag = False
         DY = np.array(DY,dtype=float)
-        
+                    
         # adjust DX and DY for pcolor plotting
-        DX = np.hstack([0.5*DX[0],DX])
-        DY = np.hstack([0.5*DY[0],DY])
+        #DX = np.hstack([0.5*DX[0],DX])
+        #DY = np.hstack([0.5*DY[0],DY])
         DX = np.cumsum(DX)
         DY = np.cumsum(DY)    
     return DX,DY,NLAY,NROW,NCOL,i

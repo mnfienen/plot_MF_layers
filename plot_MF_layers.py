@@ -6,8 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 from collections import defaultdict
 import discomb_utilities
-
-
+import pdb
 
 def set_rowscols(interval,nrows_cols,inputsname):
     try:
@@ -56,13 +55,21 @@ def make_xsectplot(nlayers,slice1,slice2,interval,slice1_ind,X,label,xlabel,colo
     ax1=plt.subplot(211)
     ax2=plt.subplot(212) 
     
-    for l in range(nlayers)[:-1]:
-        ax1.fill_between(X,slice1[:,l-1],slice1[:,l],facecolor=colors[l-1])
+    for c in range(nlayers)[:-1]:
         
-        if l==0:
+        # in case there aren't enough colors
+        try:
+            colors[c-1]
+            facecolor=colors[c-1]
+        except IndexError:
+            facecolor=colors[-1]
+            
+        ax1.fill_between(X,slice1[:,c-1],slice1[:,c],facecolor=facecolor)
+        
+        if c==0:
             # make room for label
             ax1.set_ylim(ax1.get_ylim()[0],ax1.get_ylim()[1]*1.1)             
-        
+            
         # figure out vertical exaggeration
         def vert_exaggeration(subplot,Xunits):
             
@@ -83,9 +90,9 @@ def make_xsectplot(nlayers,slice1,slice2,interval,slice1_ind,X,label,xlabel,colo
         
         
         if slice2<>None:
-            ax2.fill_between(X,slice2[:,l-1],slice2[:,l],facecolor=colors[l-1])
+            ax2.fill_between(X,slice2[:,c-1],slice2[:,c],facecolor=facecolor)
             
-            if l==0:
+            if c==0:
                 # make room for label
                 ax2.set_ylim(ax2.get_ylim()[0],ax2.get_ylim()[1]*1.1)
                 
@@ -213,6 +220,6 @@ all=np.reshape(all,(nlayers+1,rows,cols))
 DX,DY,NLAY,NROW,NCOL,i = discomb_utilities.read_meta_data(DISfile)
 if Xunits=='miles':
     DX,DY = DX/5280.0, DY/5280.0
- 
-make_xsections([all],DX,DY,[startrow,endrow,startcol,endcol],row_interval,col_interval,[xsname],colors,Xunits=Xunits)
+
+#make_xsections([all],DX,DY,[startrow,endrow,startcol,endcol],row_interval,col_interval,[xsname],colors,Xunits=Xunits)
 print "\nDone!"
