@@ -11,6 +11,6 @@ To run, enter input files and cross section parameters into plot_MF_layers.in
 
 and then at the command prompt:
 
-Python27\python plot_MF_layers.py
+Python27\python  plot_MF_layers.py
 
 (forward / for Mac)
