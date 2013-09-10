@@ -26,7 +26,7 @@ def read_nrow_ncol_vals(infile,NROW,NCOL,DTYPE,i):
 
 def read_meta_data(infile):
     indat=open(infile,'r').readlines()
-    
+    i=0
     DX = []
     DY = []
     uniform=False
@@ -35,52 +35,57 @@ def read_meta_data(infile):
     while contflag:
         if '#' in indat[0]:
             junkus = indat.pop(0)
+            i+=1
         else:
             contflag = False
             
     # get the control (uber) parameters
     tmp = indat.pop(0).strip().split()
+    i+=1
     NLAY = int(tmp.pop(0))
     NROW = int(tmp.pop(0))
     NCOL = int(tmp.pop(0))
-    
+
     # skip the CBD line
     junkus = indat.pop(0)
-        
+    i+=1    
     # check if grid is uniform (first number will be 0)
     if int(indat[0].split()[0])==0:
         uniform=True
-        i=0
         dx=float(indat[0].split()[1].split('(')[0])
         DX=(dx*np.arange(NCOL))
         junkus = indat.pop(0)
-    
+        i+=1
     if int(indat[0].split()[0])==0:
         dy=float(indat[0].split()[1].split('(')[0])
         DY=(dy*np.arange(NROW))
         junkus = indat.pop(0)
-        
+        i+=1
+    # account for the header line in the next row
+    i+=1
     if not uniform:
         junkus = indat.pop(0)
-        
+        i+=1
         # now read the DX values (make sure this is indented!)
         contflag = True
-        for i in np.arange(len(indat)):
+        for j in np.arange(len(indat)):
+            i+=1
             if contflag == False:
                 break
             if len(DX) < NCOL:
-                DX.extend(indat[i].strip().split())
+                DX.extend(indat[j].strip().split())
             else:
                 contflag = False
         DX = np.array(DX,dtype=float)
                 
         # now read the DY values
         contflag = True
-        for i in np.arange(i,len(indat)):
+        for j in np.arange(j,len(indat)):
+            i+=1
             if contflag == False:
                 break
             if len(DY) < NROW:
-                DY.extend(indat[i].strip().split())
+                DY.extend(indat[j].strip().split())
             else:
                 contflag = False
         DY = np.array(DY,dtype=float)
@@ -91,3 +96,7 @@ def read_meta_data(infile):
         DX = np.cumsum(DX)
         DY = np.cumsum(DY)    
     return DX,DY,NLAY,NROW,NCOL,i
+
+
+    
+    
