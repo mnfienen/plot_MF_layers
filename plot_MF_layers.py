@@ -221,5 +221,5 @@ DX,DY,NLAY,NROW,NCOL,i = discomb_utilities.read_meta_data(DISfile)
 if Xunits=='miles':
     DX,DY = DX/5280.0, DY/5280.0
 
-#make_xsections([all],DX,DY,[startrow,endrow,startcol,endcol],row_interval,col_interval,[xsname],colors,Xunits=Xunits)
+make_xsections([all],DX,DY,[startrow,endrow,startcol,endcol],row_interval,col_interval,[xsname],colors,Xunits=Xunits)
 print "\nDone!"
