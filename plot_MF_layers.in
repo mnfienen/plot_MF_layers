@@ -7,3 +7,5 @@ interval=50 # make a section every nth cell
 rows=100,815 # [startrow,endrow]
 columns=100,995 # [startcolumn,endcolumn]
 Xunits=miles # enter 'feet', 'miles' or 'cells'
+linewidth=0 # line width for contacts between layers, in points
+

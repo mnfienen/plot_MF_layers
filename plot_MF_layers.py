@@ -49,7 +49,12 @@ def make_xsectplot(nlayers,slice1,slice2,interval,slice1_ind,X,label,xlabel,colo
     try:
         Xunits=kwargs["Xunits"]
     except:
-        Xunits=False    
+        Xunits=False
+
+    try:
+        linewidth=kwargs["linewidth"]
+    except:
+        linewidth=0.0
     
     fig=plt.figure()
     ax1=plt.subplot(211)
@@ -64,7 +69,7 @@ def make_xsectplot(nlayers,slice1,slice2,interval,slice1_ind,X,label,xlabel,colo
         except IndexError:
             facecolor=colors[-1]
             
-        ax1.fill_between(X,slice1[:,c-1],slice1[:,c],facecolor=facecolor)
+        ax1.fill_between(X,slice1[:,c-1],slice1[:,c],facecolor=facecolor,linewidth=linewidth)
         
         if c==0:
             # make room for label
@@ -90,7 +95,7 @@ def make_xsectplot(nlayers,slice1,slice2,interval,slice1_ind,X,label,xlabel,colo
         
         
         if slice2<>None:
-            ax2.fill_between(X,slice2[:,c-1],slice2[:,c],facecolor=facecolor)
+            ax2.fill_between(X,slice2[:,c-1],slice2[:,c],facecolor=facecolor,linewidth=linewidth)
             
             if c==0:
                 # make room for label
@@ -125,7 +130,10 @@ def make_xsections(arrays,DX,DY,rc_range,row_interval,col_interval,fnames,colors
         Xunits=kwargs["Xunits"]
     except:
         Xunits=False
-    
+    try:
+        linewidth=kwargs["linewidth"]
+    except:
+        linewidth=0.0
     
     nlayers,nrows,ncols=np.shape(arrays[0])
     startrow,endrow,startcol,endcol=rc_range   
@@ -152,7 +160,7 @@ def make_xsections(arrays,DX,DY,rc_range,row_interval,col_interval,fnames,colors
                 
             label='Model row %s; VE: %sx'
             
-            make_xsectplot(nlayers,cslice1,cslice2,row_interval,c,DX,label,xlabel,colors,Xunits=Xunits)
+            make_xsectplot(nlayers,cslice1,cslice2,row_interval,c,DX,label,xlabel,colors,Xunits=Xunits,linewidth=linewidth)
             
             fig.savefig()
         print "\n\nColumns: ",
@@ -172,7 +180,7 @@ def make_xsections(arrays,DX,DY,rc_range,row_interval,col_interval,fnames,colors
                 
             label='Model column %s; VE: %sx'
             
-            make_xsectplot(nlayers,cslice1,cslice2,col_interval,c,DY,label,xlabel,colors,Xunits=Xunits)
+            make_xsectplot(nlayers,cslice1,cslice2,col_interval,c,DY,label,xlabel,colors,Xunits=Xunits,linewidth=linewidth)
             fig.savefig()
         print "\n\nsaving to %s" %(fnames[i])
         fig.close()
@@ -185,10 +193,13 @@ infile="plot_MF_layers.in"
 infile=open(infile,'r').readlines()
 inputs=defaultdict()
 for line in infile:
-    if "#" not in line.split()[0]:
-        varname=line.split("=")[0]
-        var=line.split("=")[1].split()[0]
-        inputs[varname]=var.replace("'","") # strip extra quotes
+    try:
+        if "#" not in line.split()[0]:
+            varname=line.split("=")[0]
+            var=line.split("=")[1].split()[0]
+            inputs[varname]=var.replace("'","") # strip extra quotes
+    except IndexError: # means that line is empty
+        continue
 
 modelbottoms=inputs["modelbottoms"]
 L1top=inputs["L1top"]
@@ -197,6 +208,7 @@ colors=inputs["colors"].strip('[]').split(',')
 interval=int(inputs["interval"])
 DISfile=inputs["DIS_file"]
 Xunits=inputs["Xunits"]
+linewidth=float(inputs["linewidth"])
 
 
 # get dimmensions
@@ -221,5 +233,5 @@ DX,DY,NLAY,NROW,NCOL,i = discomb_utilities.read_meta_data(DISfile)
 if Xunits=='miles':
     DX,DY = DX/5280.0, DY/5280.0
 
-make_xsections([all],DX,DY,[startrow,endrow,startcol,endcol],row_interval,col_interval,[xsname],colors,Xunits=Xunits)
+make_xsections([all],DX,DY,[startrow,endrow,startcol,endcol],row_interval,col_interval,[xsname],colors,Xunits=Xunits,linewidth=linewidth)
 print "\nDone!"
