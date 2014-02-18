@@ -1,3 +1,4 @@
+### MODFLOW Layers Settings --------------------------------------------------
 modelbottoms=Columbia_bots_corr2_SFRcorr.dat # multilayer ascii matrix of model bottoms
 L1top=L1top.DAT # ascii matrix of Layer1 top
 DIS_file=Columbia.dis # MODFLOW 2000 discretization file
@@ -8,4 +9,10 @@ rows=100,815 # [startrow,endrow]
 columns=100,995 # [startcolumn,endcolumn]
 Xunits=miles # enter 'feet', 'miles' or 'cells'
 linewidth=0 # line width for contacts between layers, in points
+### Water Table Settings------------------------------------------------------
+watertable=On # On/Off; requires hds file
+WTcolor=SkyBlue
+WTthickness=1
+HDS_file=Columbia.hds
+
 

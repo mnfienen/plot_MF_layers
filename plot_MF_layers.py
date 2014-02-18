@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 from collections import defaultdict
 import discomb_utilities
+import binaryfile_recarray as bf
 import pdb
 
 def set_rowscols(interval,nrows_cols,inputsname):
@@ -55,7 +56,21 @@ def make_xsectplot(nlayers,slice1,slice2,interval,slice1_ind,X,label,xlabel,colo
         linewidth=kwargs["linewidth"]
     except:
         linewidth=0.0
-    
+
+    try:
+        WT1=kwargs["WT1"]
+    except:
+        watertable='Off'
+
+    try:
+        WTcolor = kwargs["WTcolor"]
+    except:
+        WTcolor = 'SkyBlue'
+    try:
+        WTthick = kwargs["WTthick"]
+    except:
+        WTthick = 1.0
+
     fig=plt.figure()
     ax1=plt.subplot(211)
     ax2=plt.subplot(212) 
@@ -70,7 +85,7 @@ def make_xsectplot(nlayers,slice1,slice2,interval,slice1_ind,X,label,xlabel,colo
             facecolor=colors[-1]
             
         ax1.fill_between(X,slice1[:,c-1],slice1[:,c],facecolor=facecolor,linewidth=linewidth)
-        
+
         if c==0:
             # make room for label
             ax1.set_ylim(ax1.get_ylim()[0],ax1.get_ylim()[1]*1.1)             
@@ -119,7 +134,14 @@ def make_xsectplot(nlayers,slice1,slice2,interval,slice1_ind,X,label,xlabel,colo
             ax1.set_xticklabels(tickz_cells)
             ax2.set_xticklabels(tickz_cells)
 
-def make_xsections(arrays,DX,DY,rc_range,row_interval,col_interval,fnames,colors,**kwargs):
+    try:
+        ax1.plot(X, WT1, linewidth=WTthick, color=WTcolor)
+        if slice2<>None:
+            ax2.plot(X, kwargs["WT2"], linewidth=WTthick, color=WTcolor)
+    except:
+        pass
+
+def make_xsections(arrays,watertable,DX,DY,rc_range,row_interval,col_interval,fnames,colors,**kwargs):
     # arrays: list of numpy ndarrays to plot
     # DX,DY: column/row coordinates (in ft. or miles)
     # interval: index interval at which to make slices
@@ -134,7 +156,16 @@ def make_xsections(arrays,DX,DY,rc_range,row_interval,col_interval,fnames,colors
         linewidth=kwargs["linewidth"]
     except:
         linewidth=0.0
-    
+
+    try:
+        WTcolor = kwargs["WTcolor"]
+    except:
+        WTcolor = 'SkyBlue'
+    try:
+        WTthick = kwargs["WTthick"]
+    except:
+        WTthick = 1.0
+
     nlayers,nrows,ncols=np.shape(arrays[0])
     startrow,endrow,startcol,endcol=rc_range   
     
@@ -148,8 +179,10 @@ def make_xsections(arrays,DX,DY,rc_range,row_interval,col_interval,fnames,colors
             print "%s,%s" %(c+1,c+row_interval+1),
 
             cslice1=np.transpose(arrays[i][:,c,:])
+            WT1 = watertable[c,:]
             try:
                 cslice2=np.transpose(arrays[i][:,c+row_interval,:])
+                WT2 = watertable[c+row_interval,:]
             except IndexError:
                 cslice2=None
             
@@ -160,7 +193,8 @@ def make_xsections(arrays,DX,DY,rc_range,row_interval,col_interval,fnames,colors
                 
             label='Model row %s; VE: %sx'
             
-            make_xsectplot(nlayers,cslice1,cslice2,row_interval,c,DX,label,xlabel,colors,Xunits=Xunits,linewidth=linewidth)
+            make_xsectplot(nlayers,cslice1,cslice2,row_interval,c,DX,label,xlabel,colors,WT1=WT1,WT2=WT2,
+                           Xunits=Xunits,linewidth=linewidth,WTcolor=WTcolor,WTthick=WTthick)
             
             fig.savefig()
         print "\n\nColumns: ",
@@ -168,8 +202,10 @@ def make_xsections(arrays,DX,DY,rc_range,row_interval,col_interval,fnames,colors
             print "%s,%s" %(c+1,c+col_interval+1),
 
             cslice1=np.transpose(arrays[i][:,:,c])
+            WT1 = watertable[:,c]
             try:
                 cslice2=np.transpose(arrays[i][:,:,c+col_interval])
+                WT2 = watertable[:,c+col_interval]
             except IndexError:
                 cslice2=None
             
@@ -180,7 +216,8 @@ def make_xsections(arrays,DX,DY,rc_range,row_interval,col_interval,fnames,colors
                 
             label='Model column %s; VE: %sx'
             
-            make_xsectplot(nlayers,cslice1,cslice2,col_interval,c,DY,label,xlabel,colors,Xunits=Xunits,linewidth=linewidth)
+            make_xsectplot(nlayers,cslice1,cslice2,col_interval,c,DY,label,xlabel,colors,WT1=WT1,WT2=WT2,
+                           Xunits=Xunits,linewidth=linewidth,WTcolor=WTcolor,WTthick=WTthick)
             fig.savefig()
         print "\n\nsaving to %s" %(fnames[i])
         fig.close()
@@ -209,29 +246,39 @@ interval=int(inputs["interval"])
 DISfile=inputs["DIS_file"]
 Xunits=inputs["Xunits"]
 linewidth=float(inputs["linewidth"])
+try:
+    watertable=inputs["watertable"]
+    HDSfile=inputs["HDS_file"]
+    WTcolor=inputs["WTcolor"]
+    WTthick=float(inputs["WTthickness"])
+except:
+    watertable='Off'
+
 
 
 # get dimmensions
-temp=open(L1top).readlines()
-cols=len(temp[0].strip().split())
-rows=len(temp)
-
-startrow,endrow,row_interval=set_rowscols(interval,rows,"rows")
-startcol,endcol,col_interval=set_rowscols(interval,cols,"columns")
-
-
-temp=np.fromfile(L1top,sep=" ")
-L1top=np.reshape(temp,(rows,cols))
-bots=np.fromfile(modelbottoms,sep=" ")
-nlayers=np.size(bots)/np.size(L1top)
-bots=np.reshape(bots,(nlayers,rows,cols))
-all=np.append(L1top,bots)
-all=np.reshape(all,(nlayers+1,rows,cols))
-
-
 DX,DY,NLAY,NROW,NCOL,i = discomb_utilities.read_meta_data(DISfile)
 if Xunits=='miles':
     DX,DY = DX/5280.0, DY/5280.0
 
-make_xsections([all],DX,DY,[startrow,endrow,startcol,endcol],row_interval,col_interval,[xsname],colors,Xunits=Xunits,linewidth=linewidth)
+startrow,endrow,row_interval=set_rowscols(interval,NROW,"rows")
+startcol,endcol,col_interval=set_rowscols(interval,NCOL,"columns")
+
+
+temp=np.fromfile(L1top,sep=" ")
+L1top=np.reshape(temp,(NROW,NCOL))
+bots=np.fromfile(modelbottoms,sep=" ")
+nlayers=np.size(bots)/np.size(L1top)
+bots=np.reshape(bots,(nlayers,NROW,NCOL))
+all=np.append(L1top,bots)
+all=np.reshape(all,(nlayers+1,NROW,NCOL))
+
+if watertable=='On':
+    hds = bf.HeadFile(HDSfile)
+    heads = hds.get_data(kstp=1, kper=1)
+    watertable = heads[0,:,:]
+
+
+make_xsections([all],watertable,DX,DY,[startrow,endrow,startcol,endcol],row_interval,col_interval,[xsname],colors,
+               Xunits=Xunits,linewidth=linewidth,WTcolor=WTcolor,WTthick=WTthick)
 print "\nDone!"
