@@ -59,6 +59,7 @@ def make_xsectplot(nlayers,slice1,slice2,interval,slice1_ind,X,label,xlabel,colo
 
     try:
         WT1=kwargs["WT1"]
+        watertable='On'
     except:
         watertable='Off'
 
@@ -134,12 +135,11 @@ def make_xsectplot(nlayers,slice1,slice2,interval,slice1_ind,X,label,xlabel,colo
             ax1.set_xticklabels(tickz_cells)
             ax2.set_xticklabels(tickz_cells)
 
-    try:
+    if watertable == "On":
         ax1.plot(X, WT1, linewidth=WTthick, color=WTcolor)
         if slice2<>None:
             ax2.plot(X, kwargs["WT2"], linewidth=WTthick, color=WTcolor)
-    except:
-        pass
+
 
 def make_xsections(arrays,watertable,DX,DY,rc_range,row_interval,col_interval,fnames,colors,**kwargs):
     # arrays: list of numpy ndarrays to plot
@@ -179,22 +179,25 @@ def make_xsections(arrays,watertable,DX,DY,rc_range,row_interval,col_interval,fn
             print "%s,%s" %(c+1,c+row_interval+1),
 
             cslice1=np.transpose(arrays[i][:,c,:])
-            WT1 = watertable[c,:]
             try:
                 cslice2=np.transpose(arrays[i][:,c+row_interval,:])
-                WT2 = watertable[c+row_interval,:]
             except IndexError:
                 cslice2=None
-            
+                WT2=None
             if Xunits=='cells':    
                 xlabel='Column'
             else:
                 xlabel='Distance (%s) ' %(Xunits)            
                 
             label='Model row %s; VE: %sx'
-            
-            make_xsectplot(nlayers,cslice1,cslice2,row_interval,c,DX,label,xlabel,colors,WT1=WT1,WT2=WT2,
-                           Xunits=Xunits,linewidth=linewidth,WTcolor=WTcolor,WTthick=WTthick)
+            try:
+                WT1 = watertable[c,:]
+                if cslice2 != None:
+                    WT2 = watertable[c+row_interval,:]
+                make_xsectplot(nlayers,cslice1,cslice2,row_interval,c,DX,label,xlabel,colors,WT1=WT1,WT2=WT2,
+                               Xunits=Xunits,linewidth=linewidth,WTcolor=WTcolor,WTthick=WTthick)
+            except:
+                make_xsectplot(nlayers,cslice1,cslice2,row_interval,c,DX,label,xlabel,colors,Xunits=Xunits,linewidth=linewidth)
             
             fig.savefig()
         print "\n\nColumns: ",
@@ -202,13 +205,11 @@ def make_xsections(arrays,watertable,DX,DY,rc_range,row_interval,col_interval,fn
             print "%s,%s" %(c+1,c+col_interval+1),
 
             cslice1=np.transpose(arrays[i][:,:,c])
-            WT1 = watertable[:,c]
             try:
                 cslice2=np.transpose(arrays[i][:,:,c+col_interval])
-                WT2 = watertable[:,c+col_interval]
             except IndexError:
                 cslice2=None
-            
+                WT2=None
             if Xunits=='cells':
                 xlabel='Row'  
             else:
@@ -216,8 +217,14 @@ def make_xsections(arrays,watertable,DX,DY,rc_range,row_interval,col_interval,fn
                 
             label='Model column %s; VE: %sx'
             
-            make_xsectplot(nlayers,cslice1,cslice2,col_interval,c,DY,label,xlabel,colors,WT1=WT1,WT2=WT2,
-                           Xunits=Xunits,linewidth=linewidth,WTcolor=WTcolor,WTthick=WTthick)
+            try:
+                WT1 = watertable[:,c]
+                if cslice2 != None:
+                    WT2 = watertable[:,c+row_interval]
+                make_xsectplot(nlayers,cslice1,cslice2,col_interval,c,DY,label,xlabel,colors,WT1=WT1,WT2=WT2,
+                               Xunits=Xunits,linewidth=linewidth,WTcolor=WTcolor,WTthick=WTthick)
+            except:
+                make_xsectplot(nlayers,cslice1,cslice2,col_interval,c,DY,label,xlabel,colors,Xunits=Xunits,linewidth=linewidth)
             fig.savefig()
         print "\n\nsaving to %s" %(fnames[i])
         fig.close()
@@ -273,7 +280,7 @@ bots=np.reshape(bots,(nlayers,NROW,NCOL))
 all=np.append(L1top,bots)
 all=np.reshape(all,(nlayers+1,NROW,NCOL))
 
-if watertable=='On':
+if watertable.lower()=='on':
     hds = bf.HeadFile(HDSfile)
     heads = hds.get_data(kstp=1, kper=1)
     watertable = heads[0,:,:]
