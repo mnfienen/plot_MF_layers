@@ -1,3 +1,10 @@
+'''
+methods to read MODFLOW and MT3D binary output
+authored by Chris Langevin (USGS)
+obtained from FloPy source code: https://flopy.googlecode.com/svn/trunk/flopy/utils/binaryfile_recarray.py
+2/14/2014
+'''
+
 import numpy as np
 from collections import OrderedDict
 
