@@ -264,28 +264,35 @@ except:
 
 
 # get dimmensions
-DX,DY,NLAY,NROW,NCOL,i = discomb_utilities.read_meta_data(DISfile)
+DX, DY, NLAY, NROW, NCOL, i = discomb_utilities.read_meta_data(DISfile)
 if Xunits=='miles':
     DX,DY = DX/5280.0, DY/5280.0
 
-startrow,endrow,row_interval=set_rowscols(interval,NROW,"rows")
-startcol,endcol,col_interval=set_rowscols(interval,NCOL,"columns")
+startrow, endrow, row_interval = set_rowscols(interval, NROW, "rows")
+startcol, endcol, col_interval = set_rowscols(interval, NCOL, "columns")
 
 
-temp=np.fromfile(L1top,sep=" ")
-L1top=np.reshape(temp,(NROW,NCOL))
-bots=np.fromfile(modelbottoms,sep=" ")
-nlayers=np.size(bots)/np.size(L1top)
-bots=np.reshape(bots,(nlayers,NROW,NCOL))
-all=np.append(L1top,bots)
-all=np.reshape(all,(nlayers+1,NROW,NCOL))
+#temp=np.fromfile(L1top,sep=" ")
+#L1top=np.reshape(temp,(NROW,NCOL))
+#bots=np.fromfile(modelbottoms,sep=" ")
 
+# get layer tops/bottoms from DIS file
+layer_elevs=np.zeros((NLAY+1, NROW, NCOL))
+for c in range(NLAY+1):
+    tmp, i = discomb_utilities.read_nrow_ncol_vals(DISfile, NROW, NCOL, 'float', i)
+    layer_elevs[c, :, :] = tmp
+'''
+#nlayers=np.size(bots)/np.size(L1top)
+bots=np.reshape(bots, (NLAY, NROW, NCOL))
+all=np.append(L1top, bots)
+all=np.reshape(all, (NLAY+1, NROW, NCOL))
+'''
 if watertable.lower()=='on':
     hds = bf.HeadFile(HDSfile)
     heads = hds.get_data(kstp=1, kper=1)
     watertable = heads[0,:,:]
 
 
-make_xsections([all],watertable,DX,DY,[startrow,endrow,startcol,endcol],row_interval,col_interval,[xsname],colors,
+make_xsections([layer_elevs],watertable,DX,DY,[startrow,endrow,startcol,endcol],row_interval,col_interval,[xsname],colors,
                Xunits=Xunits,linewidth=linewidth,WTcolor=WTcolor,WTthick=WTthick)
 print "\nDone!"
