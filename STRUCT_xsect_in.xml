@@ -1,0 +1,57 @@
+<data>
+    <layers>
+        <UseDis>True</UseDis>
+        
+    </layers>
+    
+    <files>
+        <DIS_file>SLMB-U.dis</DIS_file>
+        <xsname>USG_xsections1.pdf</xsname>        
+    </files>
+    <colors>
+    <!-- Colors are HTML named colors like at 
+        http://www.w3schools.com/html/html_colornames.asp -->
+        <color>Blue</color>
+        <color>Coral</color>
+        <color>Crimson</color>
+        <color>DarkBlue</color>
+        <color>FireBrick</color>
+        <color>ForestGreen</color>
+        <color>Gold</color>
+        <color>OliveDrab</color>
+        <color>OrangeRed</color>
+        <color>Olive</color>
+        <color>Peru</color>
+        <color>Red</color>
+        <color>Wheat</color>
+        <color>YellowGreen</color>
+        <color>SandyBrown</color>
+        <color>SeaGreen</color>
+        <color>Linen</color>
+        <color>Maroon</color>
+        <color>Indigo</color>
+        <color>DarkOrchid</color>
+    </colors>
+    <rows>
+        <startrow>274</startrow>
+        <endrow>277</endrow>
+    </rows>
+    <columns>
+        <startcolumn>155</startcolumn>
+        <endcolumn>158</endcolumn>
+    </columns>
+    <options>
+        <interval>1</interval>
+        <Xunits>cells</Xunits> <!-- cells, feet, or miles -->
+        <linewidth>1</linewidth> <!-- for contacts between layers in points -->
+        <watertable>Off</watertable> <!-- On or Off for watertable (requires HDS file if On -->
+        <VE>250</VE> <!-- optional vertical exaggeration -->
+    </options>
+    <!-- optional settings if watertable is On -->
+    <WaterTableSettings>
+        <WTColor>SkyBlue</WTColor>
+        <WTthickness>1</WTthickness>
+        <HDS_file>nofile.hds</HDS_file>
+    </WaterTableSettings>
+    
+</data>
