@@ -1,18 +1,18 @@
 ### MODFLOW Layers Settings --------------------------------------------------
 modelbottoms=None # multilayer ascii matrix of model bottoms
 L1top=None # ascii matrix of Layer1 top
-DIS_file=BadRiver.dis # MODFLOW 2000 discretization file
+DIS_file=D:\ATLData\BadRiver\Calibration_runs\Opt6\BadRiver.dis # MODFLOW 2000 discretization file
 xsname=BR_xsections.pdf # output file name
-colors=Peru,SaddleBrown,OliveDrab,CornSilk,Teal,CornSilk # choose any html colors
+colors=SaddleBrown,SaddleBrown,Silver,Silver,Silver # choose any html colors
 interval=50 # make a section every nth cell
-rows=100,800 # [startrow,endrow]
-columns=100,800 # [startcolumn,endcolumn]
+rows=50,800 # [startrow,endrow]
+columns=50,800 # [startcolumn,endcolumn]
 Xunits=cells # enter 'feet', 'miles' or 'cells'
 linewidth=0 # line width for contacts between layers, in points
 ### Water Table Settings------------------------------------------------------
 watertable=On # On/Off; requires hds file
 WTcolor=SkyBlue
 WTthickness=1
-HDS_file=BadRiver.hds
+HDS_file=D:\ATLData\BadRiver\Calibration_runs\Opt6\BadRiver.hds
 
 
